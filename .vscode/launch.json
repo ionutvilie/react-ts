@@ -1,0 +1,11 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "cwd": "${workspaceFolder}",
+            "name": "Chrome",
+            "type": "node",
+            "request": "launch"
+        }
+    ]
+}

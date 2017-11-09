@@ -1,0 +1,45 @@
+// import * as React from 'react';
+// import { Router, Route, IndexRoute, hashHistory } from 'react-router';
+// import { App } from './app';
+// import { About, MembersPage } from './components';
+
+// export const AppRouter: React.StatelessComponent<{}> = () => {
+//     return (
+//         <Router history={hashHistory}>
+//             <Route path="/" component={App} >
+//                 <IndexRoute component={About} />
+//                 <Route path="/about" component={About} />
+//                 <Route path="/members" component={MembersPage} />
+//             </Route>
+//         </Router>
+//     );
+// }
+
+import * as React from "react";
+import { Route, Link as RouterLink } from 'react-router-dom'
+import { ListItem } from 'react-md';
+import { Icon } from 'react-fa'
+
+
+export function NavLink(label: any, to: string, active: boolean, icon: any): any {
+        <Route path={to} exact={active}>
+        {({ match }) => {
+            let leftIcon;
+            if (icon) {
+                leftIcon = <Icon name={icon} />;
+            }
+
+            return (
+                <ListItem
+                    component={RouterLink}
+                    active={!!match}
+                    to={to}
+                    primaryText={label}
+                    leftIcon={leftIcon}
+                />
+            );
+        }}
+    </Route>
+}
+
+export default NavLink

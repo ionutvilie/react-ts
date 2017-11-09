@@ -1,0 +1,19 @@
+# Caches and modules
+.jest-cache
+.sass-cache
+bindata.go
+node_modules
+
+# Compiled files
+/dist
+/build/*
+/src/css
+
+
+# Others
+.DS_STORE
+*.log
+
+# Locks
+package-lock.json
+yarn.lock

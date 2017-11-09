@@ -1,0 +1,40 @@
+    // Here you can add other styles
+    $md-light-theme: true;
+    $md-primary-color: #003b7e;
+    $md-secondary-color: #F9AE00;
+    $md-drawer-desktop-mini-width: 55px;
+    $md-font-icon-size: 12px;
+    .App {
+        text-align: center;
+    }
+
+    .App-banner {
+        float: left;
+        padding-top: 8px;
+        margin: 0;
+    }
+
+    .App-title {
+        float: left;
+    }
+
+    .App-logo {
+        animation: App-logo-spin infinite 20s linear;
+        height: 80px;
+    }
+
+    .App-intro {
+        font-size: large;
+        color: $md-secondary-color
+    }
+
+    @keyframes App-logo-spin {
+        from {
+            transform: rotate(0deg);
+        }
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    .md-icon {}
