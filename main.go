@@ -3,8 +3,9 @@ package main
 import (
 	"fmt"
 
-	"github.com/iris-contrib/middleware/cors"
 	"github.com/kataras/iris"
+
+	"github.com/iris-contrib/middleware/cors"
 	"github.com/kataras/iris/middleware/logger"
 	"github.com/kataras/iris/middleware/recover"
 )
@@ -29,13 +30,14 @@ func newApp() *iris.Application {
 		// ctx.Exec("GET", "/web")
 	})
 
-	app.RegisterView(iris.HTML("web", ".html").Binary(Asset, AssetNames))
+	app.RegisterView(iris.HTML("./web", ".html").Binary(Asset, AssetNames))
 	app.Get("/web", func(ctx iris.Context) {
 		ctx.View("index.html")
 	})
 
-	assetHandler := app.StaticEmbeddedHandler("web", Asset, AssetNames)
-	app.SPA(assetHandler)
+// 	assetHandler := app.StaticEmbeddedHandler("web", Asset, AssetNames)
+// 	app.SPA(assetHandler) or
+	app.StaticEmbedded("/", "./web", Asset, AssetNames)
 
 	app.Get(".well-known", func(ctx iris.Context) {
 		ctx.WriteString("OK")
