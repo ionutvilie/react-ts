@@ -38,7 +38,7 @@
     "watch-css": "npm run build-css && node-sass-chokidar --include-path ./node_modules src/ -o src/css/ --watch --recursive",
     "start-js": "react-scripts-ts start",
     "start": "npm-run-all -p watch-css start-js",
-    "build": "react-scripts-ts build",
+    "build": "npm run build-css && react-scripts-ts build && mv build web",
     "test": "react-scripts-ts test --env=jsdom",
     "eject": "react-scripts-ts eject"
   }

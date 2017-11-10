@@ -3,55 +3,39 @@ package main
 import (
 	"fmt"
 
+	"github.com/iris-contrib/middleware/cors"
 	"github.com/kataras/iris"
 	"github.com/kataras/iris/middleware/logger"
 	"github.com/kataras/iris/middleware/recover"
 )
 
+func setCORSAlowAll(ctx iris.Context) iris.Context {
+	ctx.Header("Access-Control-Allow-Headers", "Accept, Authorization, Content-Type, Origin")
+	ctx.Header("Access-Control-Allow-Headers", "Accept, Authorization, Content-Type, Origin")
+	ctx.Header("Access-Control-Allow-Methods", "GET, OPTIONS")
+	ctx.Header("Access-Control-Allow-Origin", "*")
+	ctx.Header("Access-Control-Expose-Headers", "Date")
+	return ctx
+}
+
 func newApp() *iris.Application {
 	app := iris.New()
+
 	app.Use(recover.New())
 	app.Use(logger.New())
 
-	// Method:   GET
-	// Resource: http://localhost:8080
-	// app.StaticEmbedded("/{dummy:string}", "./static", Asset, AssetNames)
-	// app.StaticWeb("/web", "./build")
-	// app.Handle("GET", "/", func(ctx iris.Context) {
-	// 	ctx.HTML("<h1>Welcome</h1>")
-	// 	ctx.
-	// })
-
-	// var page = struct {
-	// 	Title string
-	// }{"Welcome"}
-
 	app.OnErrorCode(404, func(ctx iris.Context) {
-		app.Logger().Info(fmt.Sprintf("%v", ctx.GetStatusCode()) + " : " + ctx.Path())
-		ctx.Exec("GET", "/web")
+		app.Logger().Info(fmt.Sprintf("%v", ctx.GetStatusCode()), " : ", ctx.Path())
+		// ctx.Exec("GET", "/web")
 	})
 
-	// app.RegisterView(iris.HTML("build", ".html").Binary(Asset, AssetNames))
-
-	// app.Get("/", func(ctx iris.Context) {
-	// 	ctx.ViewData("Page", page)
-	// 	ctx.View("index.html")
-	// })
-
-	// assetHandler := app.StaticEmbeddedHandler("build", Asset, AssetNames)
-	// as an alternative of SPA you can take a look at the /routing/dynamic-path/root-wildcard
-	// example too
-	// app.SPA(assetHandler)
-
-	app.Get("/", func(ctx iris.Context) {
-		ctx.Redirect("/web")
+	app.RegisterView(iris.HTML("web", ".html").Binary(Asset, AssetNames))
+	app.Get("/web", func(ctx iris.Context) {
+		ctx.View("index.html")
 	})
 
-	app.StaticWeb("/web", "./build/")
-
-	app.Get("/ping", func(ctx iris.Context) {
-		ctx.WriteString("pong")
-	})
+	assetHandler := app.StaticEmbeddedHandler("web", Asset, AssetNames)
+	app.SPA(assetHandler)
 
 	app.Get(".well-known", func(ctx iris.Context) {
 		ctx.WriteString("OK")
@@ -65,11 +49,38 @@ func newApp() *iris.Application {
 	app.Get(".well-known/metrics", func(ctx iris.Context) {
 		ctx.StatusCode(200)
 	})
+
+	v1 := app.Party("/api/v1")
+	// v1.Use(crs)  /// does not work
+	{
+		v1.Get("/home", func(ctx iris.Context) {
+			result := `[{ "label": "foo", "href": "bar" }, { "label": "bar", "href": "foo" }]`
+			ctx = setCORSAlowAll(ctx)
+			ctx.Header("Age", "0")
+			ctx.ContentType("application/json")
+			ctx.WriteString(string(result))
+		})
+	}
+	crs := cors.New(cors.Options{
+		AllowedOrigins:   []string{"*"}, // allows everything, use that to change the hosts.
+		AllowCredentials: true,
+	})
+
+	v2 := app.Party("/api/v2")
+	v2.Use(crs)
+	{
+		v2.Get("/home", func(ctx iris.Context) {
+			result := `[{ "label": "foo", "href": "bar" }, { "label": "bar", "href": "foo" }]`
+			ctx.Header("Age", "0")
+			ctx.ContentType("application/json")
+			ctx.WriteString(result)
+		})
+
+	}
 	return app
 }
 
 func main() {
 	app := newApp()
-	fmt.Println(app.GetRoutes())
-	app.Run(iris.Addr(":9090"))
+	app.Run(iris.Addr(":8080"))
 }
