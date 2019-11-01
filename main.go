@@ -3,11 +3,11 @@ package main
 import (
 	"fmt"
 
-	"github.com/kataras/iris"
+	"github.com/kataras/iris/v12"
 
 	"github.com/iris-contrib/middleware/cors"
-	"github.com/kataras/iris/middleware/logger"
-	"github.com/kataras/iris/middleware/recover"
+	"github.com/kataras/iris/v12/middleware/logger"
+	"github.com/kataras/iris/v12/middleware/recover"
 )
 
 func setCORSAlowAll(ctx iris.Context) iris.Context {
@@ -25,7 +25,7 @@ func newApp() *iris.Application {
 	app.Use(recover.New())
 	app.Use(logger.New())
 
-	app.OnErrorCode(404, func(ctx iris.Context) {
+	app.OnErrorCode(iris.StatusNotFound, func(ctx iris.Context) {
 		app.Logger().Info(fmt.Sprintf("%v", ctx.GetStatusCode()), " : ", ctx.Path())
 		// ctx.Exec("GET", "/web")
 	})
@@ -35,9 +35,7 @@ func newApp() *iris.Application {
 		ctx.View("index.html")
 	})
 
-// 	assetHandler := app.StaticEmbeddedHandler("web", Asset, AssetNames)
-// 	app.SPA(assetHandler) or
-	app.StaticEmbedded("/", "./web", Asset, AssetNames)
+	app.HandleDir("/", "./web", iris.DirOptions{Asset: Asset, AssetNames: AssetNames})
 
 	app.Get(".well-known", func(ctx iris.Context) {
 		ctx.WriteString("OK")
@@ -53,7 +51,6 @@ func newApp() *iris.Application {
 	})
 
 	v1 := app.Party("/api/v1")
-	// v1.Use(crs)  /// does not work
 	{
 		v1.Get("/home", func(ctx iris.Context) {
 			result := `[{ "label": "foo", "href": "bar" }, { "label": "bar", "href": "foo" }]`
